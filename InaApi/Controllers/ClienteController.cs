@@ -13,13 +13,15 @@ namespace InaApi.Controllers
     public class ClienteController : ControllerBase
     {
         private readonly IServices<TbCliente> _IClienteService;
+        private readonly IServices<TbTipoCliente> _ITipoClienteService;
         private readonly IMapper _mapper;
 
         //Costructor
-        public ClienteController(IServices<TbCliente> iClienteService, IMapper mapper)
+        public ClienteController(IServices<TbCliente> iClienteService, IMapper mapper, IServices<TbTipoCliente> iTipoClienteService)
         {
             _IClienteService = iClienteService;
             _mapper = mapper;
+            _ITipoClienteService = iTipoClienteService;
         }
 
         /*----------------------------------------------------------------------------*/
@@ -90,6 +92,25 @@ namespace InaApi.Controllers
         {
             try
             {
+                TbCliente clienteEnt = new TbCliente();
+                clienteEnt.Cedula = cliDTO.Cedula;
+
+                clienteEnt = await _IClienteService.obtenerPorIdAsync(clienteEnt);
+
+                if (clienteEnt != null)
+                {
+                    return NotFound(new { mensaje = "El cliente ya existe en la base de datos." });
+                }
+
+                TbTipoCliente tipoCliente = new TbTipoCliente();
+                tipoCliente.Id = cliDTO.TipoCliente;
+                tipoCliente = await _ITipoClienteService.obtenerPorIdAsync(tipoCliente);
+
+                if (tipoCliente != null)
+                {
+                    return NotFound(new { mensaje = "El tipo de cliente no existe." });
+                }
+
                 TbCliente cliente =  _mapper.Map<TbCliente>(cliDTO);
 
                 cliente = await _IClienteService.guardarAsync(cliente);
@@ -102,50 +123,100 @@ namespace InaApi.Controllers
             }
         }
 
-        /*-----------------------------------------------------------------------------------------*/
-
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Put([FromBody] ClienteDTO cliDTO)
-        {
-            try
-            {
-                TbCliente cliente = _mapper.Map<TbCliente>(cliDTO);
-                //cliente.Cedula = id;
-
-                cliente = await _IClienteService.actualizarAsync(cliente);
-                return Ok(new { mensaje = "Cliente actualizado." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
+  
         /*----------------------------------------------------------------------------------------*/
 
         [HttpDelete("{id}")]
-        public async Task<bool> Delete(string id)
+        public async Task<ActionResult<bool>> Delete(string id)
         {
             try
             {
-                TbCliente cliente = new TbCliente();
-                cliente.Cedula = id;
-                cliente = await _IClienteService.obtenerPorIdAsync(cliente);
+                TbCliente clienteEnt = new TbCliente();
 
-                if (cliente == null)
+                clienteEnt.Cedula = id;
+
+                clienteEnt = await _IClienteService.obtenerPorIdAsync(clienteEnt);
+
+                if (clienteEnt == null)
                 {
-                    return false;
-                    //return NotFound(new { mensaje = "No existe el cliente con ese ID." });
+                    return NotFound(new { mensaje = "El cliente no existe" });
                 }
-                cliente = await _IClienteService.eliminarAsync(cliente);
-                return true;
-                //return Ok();
+
+               
+                clienteEnt.Estado = false;
+                
+
+                //Validar datos de entrada.
+
+                var res = _IClienteService.eliminarAsync(clienteEnt);
+
+                if (res.Result)
+                {
+                    return Ok(new { mensaje = "Cliente eliminado." });
+                }
+                else
+                {
+                    return BadRequest(new { mensaje = "No se pudo eliminar." });
+                }
+
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
-                //return BadRequest(ex.Message);
+                throw;
             }
         }
+
+            /*----------------------------------------------------------------------------*/
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> update(string id, [FromBody] ClienteDTO cliDTO)
+        {
+            try
+            {
+                TbCliente clienteEnt = new TbCliente();
+                    
+                clienteEnt.Cedula = id;
+
+                clienteEnt = await _IClienteService.obtenerPorIdAsync(clienteEnt);
+
+                if (clienteEnt == null)
+                {
+                    return NotFound(new { mensaje = "El cliente no existe" });
+                }
+
+                TbTipoCliente tipoCliente = new TbTipoCliente();
+                tipoCliente.Id = cliDTO.TipoCliente;
+
+                tipoCliente = await _ITipoClienteService.obtenerPorIdAsync(tipoCliente);
+
+                if (tipoCliente == null)
+                {
+                return NotFound(new { mensaje = "El tipo de cliente no existe" });
+                }
+
+                clienteEnt = _mapper.Map<TbCliente>(cliDTO);
+                clienteEnt.Cedula = id;
+                clienteEnt.CedulaNavigation.Cedula = id;
+
+                //Validar datos de entrada.
+
+                var res = _IClienteService.actualizarAsync(clienteEnt);
+
+                if (res.Result)
+                {
+                return Ok(new { mensaje = "Cliene actualizado" });
+                }
+                else
+                {
+                return BadRequest(new { mensaje = "No se pudo modificar." });
+                }
+                    
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        }
     }
-}
+

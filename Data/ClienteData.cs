@@ -15,62 +15,35 @@ namespace Data
         {
             //_dbContext.Entry(entidad).State = (Microsoft.EntityFrameworkCore.EntityState)EntityState.Modified;
 
-            var cliente = await _dbContext.TbClientes.FindAsync(entidad.Cedula);     
-            if (cliente == null)
+            try
             {
-                return false;
-            }
-            else
-            {
-                //Instaciamos persona y seteamos los datos para mandarlos a cliente
-
-
-                /*TbPersona persona = new TbPersona();
-                persona.Cedula = persona.Cedula;
-                persona.Nombre = entidad.CedulaNavigation.Nombre;
-                persona.Apellido1 = entidad.CedulaNavigation.Apellido1;
-                persona.Apellido2 = entidad.CedulaNavigation.Apellido2;
-                persona.FechaNac = entidad.CedulaNavigation.FechaNac;
-                persona.Genero = entidad.CedulaNavigation.Genero;*/
-
-                /*Error 1 si intento setear los datos de persona para setearlos a cliente, tengo dos problemas.
-                    * Si seteo la cedula, me dice que no puede cambiar la cedula.
-                    * Si lo paso sin la cedula, la cedula queda null por lo que no guardar los cambios.
-                 *Error 2, si intento setear los datos directamente a cliente por medio de CedulaNavigation, 
-                  me dice que la referencia del objeto no esta establecida como una intancia del objeto.
-                */
-
-
-                cliente.Estado = entidad.Estado;
-                cliente.DescMax = entidad.DescMax;
-                cliente.Foto = entidad.Foto;
-                cliente.CedulaNavigation.Nombre = entidad.CedulaNavigation.Nombre;
-                cliente.CedulaNavigation.Apellido1 = entidad.CedulaNavigation.Apellido1;
-                cliente.CedulaNavigation.Apellido2 = entidad.CedulaNavigation.Apellido2;
-                cliente.CedulaNavigation.FechaNac = entidad.CedulaNavigation.FechaNac;
-                cliente.CedulaNavigation.Genero = entidad.CedulaNavigation.Genero;
-
+                _dbContext.Entry(entidad).State = EntityState.Modified;
+                _dbContext.Entry(entidad.CedulaNavigation).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
             }
 
-
-            return true;
+            
         }
         
         public async Task<bool> eliminarAsync(TbCliente entidad)
         {
             //var cliente = await _dbContext.TbClientes.FindAsync(entidad.Cedula);
-            if (entidad == null)
+            try
             {
-                return false;
-            }
-            else
-            {
-                entidad.Estado = false;
+                _dbContext.Entry(entidad).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
                 return true;
             }
-            
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
 
         public async Task<TbCliente> guardarAsync(TbCliente entidad)
@@ -81,9 +54,9 @@ namespace Data
                 await _dbContext.SaveChangesAsync();
                 return entidad;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -93,12 +66,12 @@ namespace Data
             try
             {
               
-                 return await _dbContext.TbClientes.Include("CedulaNavigation").Where(x => x.Cedula.Trim() == entidad.Cedula.Trim()).SingleOrDefaultAsync();
+                 return await _dbContext.TbClientes.Include("CedulaNavigation").Where(x => x.Cedula.Trim() == entidad.Cedula.Trim() && x.Estado == true).SingleOrDefaultAsync();
                 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
     
         }
@@ -109,12 +82,12 @@ namespace Data
             {
                 using (var context = new DbProyectoInaContext())
                 {
-                    return await context.TbClientes.Include("CedulaNavigation").ToListAsync();
+                    return await context.TbClientes.Include("CedulaNavigation").Where(x => x.Estado == true).ToListAsync();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
 
         }

@@ -4,7 +4,7 @@ namespace InaApi.Models
 {
     public class ClienteDTO
     {
-        public string Cedula { get; set; } = null!;
+        public string? Cedula { get; set; } //= null!;
 
         public int TipoCliente { get; set; }
 
@@ -26,7 +26,7 @@ namespace InaApi.Models
 
        // public virtual TbPersona CedulaNavigation { get; set; } = null!;
 
-        //public virtual TbTipoCliente TipoClienteNavigation { get; set; } = null!;
+       //public virtual TbTipoCliente TipoClienteNavigation { get; set; } = null!;
     }
 }
 
