@@ -154,7 +154,7 @@ namespace InaApi.Controllers
 
         /*-------------------------------------------------------------------------------------------*/
 
-        /*Actualizar tipo cliente por id*/
+        /*Eliminar una factura*/
         [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
         {

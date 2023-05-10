@@ -17,14 +17,14 @@ namespace Services
             _facturaData = facturaData;
         }
 
-        public Task<bool> actualizarAsync(TbFactura entidad)
+        public async Task<bool> actualizarAsync(TbFactura entidad)
         {
-            throw new NotImplementedException();
+            return await _facturaData.actualizarAsync(entidad);
         }
 
-        public Task<bool> eliminarAsync(TbFactura entidad)
+        public async Task<bool> eliminarAsync(TbFactura entidad)
         {
-            throw new NotImplementedException();
+            return await _facturaData.eliminarAsync(entidad);
         }
 
         public async Task<TbFactura> guardarAsync(TbFactura entidad)

@@ -17,9 +17,18 @@ namespace Data
             _dbContext = dbContext;
         }
 
-        public Task<bool> actualizarAsync(TbFactura entidad)
+        public async Task<bool> actualizarAsync(TbFactura entidad)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _dbContext.Entry(entidad).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public async Task<bool> eliminarAsync(TbFactura entidad)

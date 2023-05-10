@@ -166,5 +166,94 @@ namespace InaApi.Controllers
                 return BadRequest(new { mensaje = "Error al obtener el cliente." });
             }
         }
+
+        /*-------------------------------------------------------------------------------------------*/
+
+        /*Eliminar una factura*/
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<bool>> Delete(int id)
+        {
+            try
+            {
+                TbFactura facturaEnt = new TbFactura();
+
+                facturaEnt.IdFactura = id;
+
+                facturaEnt = await _facturaService.obtenerPorIdAsync(facturaEnt);
+
+                if (facturaEnt == null)
+                {
+                    return NotFound(new { mensaje = "El numero de factura no existe" });
+                }
+
+
+                facturaEnt.Estado = false;
+
+
+                //Validar datos de entrada.
+
+                var res = _facturaService.eliminarAsync(facturaEnt);
+
+                if (res.Result)
+                {
+                    return Ok(new { mensaje = "Factura eliminada." });
+                }
+                else
+                {
+                    return BadRequest(new { mensaje = "No se pudo eliminar." });
+                }
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        /*-------------------------------------------------------------------------------------------*/
+
+        /*Actualizar tipo cliente por id*/
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> update(int id, [FromBody] FacturaDTO facturaDTO)
+        {
+            try
+            {
+                TbFactura facturaEnt = new TbFactura();
+
+                facturaEnt.IdFactura = id;
+
+                facturaEnt = await _facturaService.obtenerPorIdAsync(facturaEnt);
+
+
+                if (facturaEnt == null)
+                {
+                    return NotFound(new { mensaje = "El numero de factura no existe" });
+                }
+
+                //Validar datos de entrada.
+
+                facturaEnt = _mapper.Map<TbFactura>(facturaDTO);
+                facturaEnt.IdFactura = id;
+
+                var res = _facturaService.actualizarAsync(facturaEnt);
+               
+
+                if (res.Result)
+                {
+                    return Ok(new { mensaje = "La factura fue actualizado" });
+                }
+                else
+                {
+                    return BadRequest(new { mensaje = "No se pudo modificar." });
+                }
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
     }
 }
