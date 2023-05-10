@@ -23,7 +23,8 @@ builder.Services.AddControllers().AddNewtonsoftJson(opt =>
 });
 
 builder.Services.AddDbContext<DbProyectoInaContext>(
-    options => options.UseSqlServer("dbINA"));
+    options => options.UseSqlServer("dbINA")
+ );
 //builder.Configuration.GetConnectionString("dbINA") ?? throw new InvalidOperationException()));
 
 

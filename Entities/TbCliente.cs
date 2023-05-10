@@ -17,10 +17,7 @@ public partial class TbCliente
 
     public virtual TbPersona CedulaNavigation { get; set; } = null!;
 
-    public virtual TbTipoCliente TipoClienteNavigation { get; set; } = null!;
+    public virtual ICollection<TbFactura> TbFacturas { get; set; } = new List<TbFactura>();
 
-    public static implicit operator TbCliente(bool v)
-    {
-        throw new NotImplementedException();
-    }
+    public virtual TbTipoCliente TipoClienteNavigation { get; set; } = null!;
 }

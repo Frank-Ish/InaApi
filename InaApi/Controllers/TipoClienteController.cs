@@ -116,13 +116,13 @@ namespace InaApi.Controllers
 
         /*Actualizar tipo cliente por id*/
         [HttpPatch("{id}")]
-        public async Task<ActionResult> update(string id, [FromBody] TipoClienteDTO cliDTO)
+        public async Task<ActionResult> update(int id, [FromBody] TipoClienteDTO cliDTO)
         {
             try
             {
                 TbTipoCliente tipoClienteEnt = new TbTipoCliente();
 
-                tipoClienteEnt.Id = id;
+                //tipoClienteEnt.Id = id;
 
                 tipoClienteEnt = await _ITipoClienteService.obtenerPorIdAsync(tipoClienteEnt);
 
@@ -156,7 +156,7 @@ namespace InaApi.Controllers
 
         /*Actualizar tipo cliente por id*/
         [HttpDelete("{id}")]
-        public async Task<ActionResult<bool>> Delete(string id)
+        public async Task<ActionResult<bool>> Delete(int id)
         {
             try
             {

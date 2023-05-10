@@ -11,10 +11,20 @@ namespace Microsoft.Extensions.DependencyInjection
             //Inyeccion de dependencias de la Capa de negocio
             services.AddTransient<IServices<TbCliente>, ClienteService>();
             services.AddTransient<IServices<TbTipoCliente>, TipoClienteService>();
+            services.AddTransient<IServices<TbFactura>, FacturaService>();
+            services.AddTransient<IServices<TbDetalleFactura>, DetalleFacturaService>();
+            services.AddTransient<IServices<TbTipoVentum>, TipoVentaService>();
+            services.AddTransient<IServices<TbTipoPago>, TipoPagoService>();
+            services.AddTransient<IServices<TbProducto>, ProductoService>();
 
             //inyeccion de dependencias de la Capa de datos
             services.AddTransient<IData<TbCliente>, ClienteData>();
             services.AddTransient<IData<TbTipoCliente>, TipoClienteData>();
+            services.AddTransient<IData<TbFactura>, FacturaData>();
+            services.AddTransient<IData<TbDetalleFactura>, DetalleFacturaData>();
+            services.AddTransient<IData<TbTipoVentum>, TipoVentaData>();
+            services.AddTransient<IData<TbTipoPago>, TipoPagoData>();
+            services.AddTransient<IData<TbProducto>, ProductoData>();
 
             return services;
         }
