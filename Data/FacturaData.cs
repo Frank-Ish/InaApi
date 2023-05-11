@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Data
 {
@@ -19,16 +20,57 @@ namespace Data
 
         public async Task<bool> actualizarAsync(TbFactura entidad)
         {
+           
             try
             {
-                _dbContext.Entry(entidad).State = EntityState.Modified;
-                await _dbContext.SaveChangesAsync();
-                return true;
+                var facturaDb = await _dbContext.TbDetalleFacturas.Where(f => f.IdFactura == entidad.IdFactura).AsNoTracking()
+                    .ToListAsync();
+
+                if (facturaDb != null)
+                {
+                    // Encuentra los detalles que deben ser eliminados
+                    /*var detallesAEliminar = facturaDb.TbDetalleFacturas
+                        .Where(d => !entidad.TbDetalleFacturas.Any(e => e.IdDetalleFactura == d.IdDetalleFactura))
+                        .ToList();
+
+                    // Elimina los detalles
+                    _dbContext.TbDetalleFacturas.RemoveRange(detallesAEliminar);*/
+
+                    // Actualiza los detalles existentes y agrega nuevos detalles
+                    foreach (var detalle in entidad.TbDetalleFacturas)
+                    {
+                        if (detalle.IdDetalleFactura != 0)
+                        {
+                            _dbContext.Entry(detalle).State = EntityState.Modified;
+                        }
+                        else
+                        {
+                            _dbContext.Entry(detalle).State = EntityState.Added;
+                        }
+                    }
+
+                    foreach (var detalledb in facturaDb)
+                    {
+  
+                        if (entidad.TbDetalleFacturas.Where(e => e.IdDetalleFactura == detalledb.IdDetalleFactura).SingleOrDefault() == null)
+                        {
+                            _dbContext.Entry(entidad.TbDetalleFacturas.Where(e => e.IdDetalleFactura == detalledb.IdDetalleFactura).SingleOrDefault()).State = EntityState.Deleted;
+                        }
+
+                    }
+
+                    // Actualiza la factura
+                    _dbContext.Entry(entidad).State = EntityState.Modified;
+                    await _dbContext.SaveChangesAsync();
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+            
         }
 
         public async Task<bool> eliminarAsync(TbFactura entidad)
@@ -49,6 +91,10 @@ namespace Data
         {
             try
             {
+                foreach (var detalle in entidad.TbDetalleFacturas)
+                {
+                    detalle.IdProductoNavigation = null;
+                }   
                 _dbContext.TbFacturas.Add(entidad);
                 await _dbContext.SaveChangesAsync();
                 return entidad;
@@ -65,7 +111,7 @@ namespace Data
             {
                 return await _dbContext.TbFacturas.Include("TbDetalleFacturas").Where(x => x.IdFactura == entidad.IdFactura && x.Estado == true)
                     .Include("TipoPagoNavigation").Where(X => X.Estado == true)
-                    .Include("TipoVentaNavigation").Where(X => X.Estado == true).SingleOrDefaultAsync();
+                    .Include("TipoVentaNavigation").Where(X => X.Estado == true).AsNoTracking().SingleOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -86,5 +132,7 @@ namespace Data
                 throw;
             }
         }
+
+        
     }
 }

@@ -14,6 +14,6 @@
 
         public bool Estado { get; set; }
 
-        public List<DetalleFacturaDTO>? TbDetalleFacturas { get; set; }
+        public List<DetalleFacturaDTO> TbDetalleFacturas { get; set; }
     }
 }

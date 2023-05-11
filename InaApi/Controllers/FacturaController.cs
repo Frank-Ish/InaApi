@@ -233,12 +233,19 @@ namespace InaApi.Controllers
 
                 //Validar datos de entrada.
 
+                foreach (var detalle in facturaDTO.TbDetalleFacturas)
+                {
+                    if(detalle.IdFactura != id)
+                    {
+                        return NotFound(new { mensaje = "El detalle que intenta actualizar no coincide con el numero de fatura." });
+                    }
+                }
+
                 facturaEnt = _mapper.Map<TbFactura>(facturaDTO);
                 facturaEnt.IdFactura = id;
 
                 var res = _facturaService.actualizarAsync(facturaEnt);
                
-
                 if (res.Result)
                 {
                     return Ok(new { mensaje = "La factura fue actualizado" });
